@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main()
+    {
+        // Generación de ciudadanos ficticios
+        HashSet<string> ciudadanos = GenerarCiudadanos(500);
+        HashSet<string> vacunadosPfizer = GenerarSubconjunto(ciudadanos, 75);
+        HashSet<string> vacunadosAstrazeneca = GenerarSubconjunto(ciudadanos.Except(vacunadosPfizer).ToHashSet(), 75);
+
+        // Listado de ciudadanos no vacunados
+        HashSet<string> noVacunados = new HashSet<string>(ciudadanos.Except(vacunadosPfizer).Except(vacunadosAstrazeneca));
+
+        // Listado de ciudadanos vacunados con ambas vacunas (intersección)
+        HashSet<string> vacunadosAmbas = new HashSet<string>(vacunadosPfizer.Intersect(vacunadosAstrazeneca));
+
+        // Listado de ciudadanos solo vacunados con Pfizer
+        HashSet<string> soloPfizer = new HashSet<string>(vacunadosPfizer.Except(vacunadosAstrazeneca));
+
+        // Listado de ciudadanos solo vacunados con Astrazeneca
+        HashSet<string> soloAstrazeneca = new HashSet<string>(vacunadosAstrazeneca.Except(vacunadosPfizer));
+
+        // Mostrar resultados
+        Console.WriteLine($"Total de ciudadanos: {ciudadanos.Count}");
+        Console.WriteLine($"No vacunados: {noVacunados.Count}");
+        Console.WriteLine($"Vacunados con ambas vacunas: {vacunadosAmbas.Count}");
+        Console.WriteLine($"Vacunados solo con Pfizer: {soloPfizer.Count}");
+        Console.WriteLine($"Vacunados solo con Astrazeneca: {soloAstrazeneca.Count}");
+    }
+
+    static HashSet<string> GenerarCiudadanos(int cantidad)
+    {
+        HashSet<string> ciudadanos = new HashSet<string>();
+        Random rnd = new Random();
+        while (ciudadanos.Count < cantidad)
+        {
+            ciudadanos.Add("Ciudadano_" + rnd.Next(1000, 9999));
+        }
+        return ciudadanos;
+    }
+
+    static HashSet<string> GenerarSubconjunto(HashSet<string> conjuntoOriginal, int cantidad)
+    {
+        return new HashSet<string>(conjuntoOriginal.OrderBy(_ => Guid.NewGuid()).Take(cantidad));
+    }
+}
