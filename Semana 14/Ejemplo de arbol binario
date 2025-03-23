@@ -1,0 +1,183 @@
+using System;
+
+class Nodo
+{
+    public int Valor;
+    public Nodo Izquierdo;
+    public Nodo Derecho;
+
+    public Nodo(int valor)
+    {
+        Valor = valor;
+        Izquierdo = null;
+        Derecho = null;
+    }
+}
+
+class ArbolBinario
+{
+    private Nodo raiz;
+
+    public ArbolBinario()
+    {
+        raiz = null;
+    }
+
+    // Insertar un nuevo valor en el árbol
+    public void Insertar(int valor)
+    {
+        raiz = InsertarRecursivo(raiz, valor);
+    }
+
+    private Nodo InsertarRecursivo(Nodo actual, int valor)
+    {
+        if (actual == null)
+        {
+            return new Nodo(valor);
+        }
+
+        if (valor < actual.Valor)
+        {
+            actual.Izquierdo = InsertarRecursivo(actual.Izquierdo, valor);
+        }
+        else if (valor > actual.Valor)
+        {
+            actual.Derecho = InsertarRecursivo(actual.Derecho, valor);
+        }
+        return actual;
+    }
+
+    // Buscar un valor en el árbol
+    public bool Buscar(int valor)
+    {
+        return BuscarRecursivo(raiz, valor);
+    }
+
+    private bool BuscarRecursivo(Nodo actual, int valor)
+    {
+        if (actual == null)
+        {
+            return false;
+        }
+        if (valor == actual.Valor)
+        {
+            return true;
+        }
+        return valor < actual.Valor
+            ? BuscarRecursivo(actual.Izquierdo, valor)
+            : BuscarRecursivo(actual.Derecho, valor);
+    }
+
+    // Recorridos del árbol
+    public void Inorden()
+    {
+        InordenRecursivo(raiz);
+        Console.WriteLine();
+    }
+
+    private void InordenRecursivo(Nodo actual)
+    {
+        if (actual != null)
+        {
+            InordenRecursivo(actual.Izquierdo);
+            Console.Write(actual.Valor + " ");
+            InordenRecursivo(actual.Derecho);
+        }
+    }
+
+    public void Preorden()
+    {
+        PreordenRecursivo(raiz);
+        Console.WriteLine();
+    }
+
+    private void PreordenRecursivo(Nodo actual)
+    {
+        if (actual != null)
+        {
+            Console.Write(actual.Valor + " ");
+            PreordenRecursivo(actual.Izquierdo);
+            PreordenRecursivo(actual.Derecho);
+        }
+    }
+
+    public void Postorden()
+    {
+        PostordenRecursivo(raiz);
+        Console.WriteLine();
+    }
+
+    private void PostordenRecursivo(Nodo actual)
+    {
+        if (actual != null)
+        {
+            PostordenRecursivo(actual.Izquierdo);
+            PostordenRecursivo(actual.Derecho);
+            Console.Write(actual.Valor + " ");
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        ArbolBinario arbol = new ArbolBinario();
+        int opcion, valor;
+
+        do
+        {
+            Console.WriteLine("\n=== Menú Árbol Binario ===");
+            Console.WriteLine("1. Insertar un valor");
+            Console.WriteLine("2. Buscar un valor");
+            Console.WriteLine("3. Recorrido Inorden");
+            Console.WriteLine("4. Recorrido Preorden");
+            Console.WriteLine("5. Recorrido Postorden");
+            Console.WriteLine("6. Salir");
+            Console.Write("Selecciona una opción: ");
+            opcion = int.Parse(Console.ReadLine());
+
+            switch (opcion)
+            {
+                case 1:
+                    Console.Write("Ingresa el valor a insertar: ");
+                    valor = int.Parse(Console.ReadLine());
+                    arbol.Insertar(valor);
+                    Console.WriteLine($"Valor {valor} insertado correctamente.");
+                    break;
+
+                case 2:
+                    Console.Write("Ingresa el valor a buscar: ");
+                    valor = int.Parse(Console.ReadLine());
+                    if (arbol.Buscar(valor))
+                        Console.WriteLine($"El valor {valor} se encuentra en el árbol.");
+                    else
+                        Console.WriteLine($"El valor {valor} no se encuentra en el árbol.");
+                    break;
+
+                case 3:
+                    Console.Write("Recorrido Inorden: ");
+                    arbol.Inorden();
+                    break;
+
+                case 4:
+                    Console.Write("Recorrido Preorden: ");
+                    arbol.Preorden();
+                    break;
+
+                case 5:
+                    Console.Write("Recorrido Postorden: ");
+                    arbol.Postorden();
+                    break;
+
+                case 6:
+                    Console.WriteLine("Saliendo del programa...");
+                    break;
+
+                default:
+                    Console.WriteLine("Opción no válida, intenta de nuevo.");
+                    break;
+            }
+        } while (opcion != 6);
+    }
+}
