@@ -1,0 +1,97 @@
+using System;
+using System.Collections.Generic;
+
+class Grafo
+{
+    private Dictionary<string, List<(string destino, int costo)>> adyacencia;
+
+    public Grafo()
+    {
+        adyacencia = new Dictionary<string, List<(string, int)>>();
+    }
+
+    // Agregar una arista (vuelo) al grafo
+    public void AgregarVuelo(string origen, string destino, int costo)
+    {
+        if (!adyacencia.ContainsKey(origen))
+            adyacencia[origen] = new List<(string, int)>();
+        adyacencia[origen].Add((destino, costo));
+    }
+
+    // Algoritmo de Dijkstra para encontrar el vuelo más barato
+    public (int costo, List<string> ruta) EncontrarVueloBarato(string origen, string destino)
+    {
+        var costos = new Dictionary<string, int>();
+        var anteriores = new Dictionary<string, string>();
+        var cola = new SortedSet<(int costo, string ciudad)>();
+        var visitados = new HashSet<string>();
+
+        foreach (var ciudad in adyacencia.Keys)
+            costos[ciudad] = int.MaxValue;
+
+        costos[origen] = 0;
+        cola.Add((0, origen));
+
+        while (cola.Count > 0)
+        {
+            var (costoActual, ciudadActual) = cola.Min;
+            cola.Remove(cola.Min);
+
+            if (ciudadActual == destino) break;
+            if (visitados.Contains(ciudadActual)) continue;
+
+            visitados.Add(ciudadActual);
+
+            if (!adyacencia.ContainsKey(ciudadActual)) continue;
+
+            foreach (var (vecino, costoArista) in adyacencia[ciudadActual])
+            {
+                int nuevoCosto = costoActual + costoArista;
+                if (nuevoCosto < costos[vecino])
+                {
+                    costos[vecino] = nuevoCosto;
+                    anteriores[vecino] = ciudadActual;
+                    cola.Add((nuevoCosto, vecino));
+                }
+            }
+        }
+
+        // Reconstruir la ruta
+        var ruta = new List<string>();
+        string actual = destino;
+        while (actual != null)
+        {
+            ruta.Add(actual);
+            anteriores.TryGetValue(actual, out actual);
+        }
+        ruta.Reverse();
+
+        return (costos[destino] == int.MaxValue ? -1 : costos[destino], ruta);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Grafo vuelos = new Grafo();
+
+        // Base de datos de vuelos (ciudad origen, ciudad destino, costo en USD)
+        vuelos.AgregarVuelo("Lima", "Cusco", 50);
+        vuelos.AgregarVuelo("Lima", "Arequipa", 70);
+        vuelos.AgregarVuelo("Cusco", "Arequipa", 30);
+        vuelos.AgregarVuelo("Arequipa", "Puno", 40);
+        vuelos.AgregarVuelo("Cusco", "Puno", 80);
+
+        // Encontrar el vuelo más barato de Lima a Puno
+        var (costo, ruta) = vuelos.EncontrarVueloBarato("Lima", "Puno");
+
+        if (costo == -1)
+            Console.WriteLine("No hay ruta disponible.");
+        else
+        {
+            Console.WriteLine($"Costo mínimo: ${costo}");
+            Console.WriteLine("Ruta: " + string.Join(" -> ", ruta));
+        }
+    }
+}
